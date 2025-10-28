@@ -17,13 +17,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class DepartamentoMapper {
 
-
     public Departamento toEntity(DepartamentoRequestDTO dto) {
         if (dto == null) return null;
 
         Departamento departamento = new Departamento();
         departamento.setNome(dto.nome());
         departamento.setSigla(dto.sigla());
+        departamento.setAtivo(dto.ativo());
 
         return departamento;
     }
@@ -32,10 +32,10 @@ public class DepartamentoMapper {
         if (departamento == null) return null;
 
         return new DepartamentoResponseDTO(
-                departamento.getId(),
-                departamento.getNome(),
-                departamento.getSigla(),
-                departamento.getAtivo()
+            departamento.getId(),
+            departamento.getNome(),
+            departamento.getSigla(),
+            departamento.getAtivo()
         );
     }
 }

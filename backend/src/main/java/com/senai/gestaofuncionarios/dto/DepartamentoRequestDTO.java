@@ -5,6 +5,7 @@
 package com.senai.gestaofuncionarios.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 /**
  *
@@ -15,5 +16,8 @@ public record DepartamentoRequestDTO (
     String nome,
     
     @NotBlank(message = "A sigla é obrigatório.") 
-    String sigla
+    String sigla,
+        
+    @NotNull(message = "O campo ativo é obrigatório.")
+    Boolean ativo
 ) {}

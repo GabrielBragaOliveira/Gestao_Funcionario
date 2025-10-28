@@ -34,6 +34,9 @@ public record FuncionarioRequestDTO(
     @NotNull(message = "A data de admissão é obrigatória.") 
     LocalDate dataAdmissao,
     
+    @NotNull(message = "O campo ativo é obrigatório.")
+    Boolean ativo,
+    
     @NotNull(message = "O ID do departamento é obrigatório.")
     Long departamentoId 
         

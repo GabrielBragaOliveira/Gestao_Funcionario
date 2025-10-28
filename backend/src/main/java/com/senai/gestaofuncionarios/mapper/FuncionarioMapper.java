@@ -6,8 +6,9 @@ package com.senai.gestaofuncionarios.mapper;
 
 import com.senai.gestaofuncionarios.dto.FuncionarioRequestDTO;
 import com.senai.gestaofuncionarios.dto.FuncionarioResponseDTO;
-import com.senai.gestaofuncionarios.model.Departamento;
 import com.senai.gestaofuncionarios.model.Funcionario;
+import com.senai.gestaofuncionarios.repository.DepartamentoRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,6 +17,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class FuncionarioMapper {
+    
+    @Autowired
+    private DepartamentoRepository departamentoRepository;
+    
+    @Autowired
+    private DepartamentoMapper departamentoMapper;
 
     public Funcionario toEntity(FuncionarioRequestDTO dto) {
         if (dto == null) return null;
@@ -26,6 +33,12 @@ public class FuncionarioMapper {
         funcionario.setCargo(dto.cargo());
         funcionario.setSalario(dto.salario());
         funcionario.setDataAdmissao(dto.dataAdmissao());
+        funcionario.setAtivo(dto.ativo());
+
+        funcionario.setDepartamento(
+            departamentoRepository.findById(dto.departamentoId())
+                .orElseThrow(() -> new IllegalArgumentException("Departamento não encontrado com o ID informado."))
+        );
         return funcionario;
     }
 
@@ -33,13 +46,14 @@ public class FuncionarioMapper {
         if (funcionario == null) return null;
 
         return new FuncionarioResponseDTO(
-                funcionario.getId(),
-                funcionario.getNome(),
-                funcionario.getEmail(),
-                funcionario.getCargo(),
-                funcionario.getSalario(),
-                funcionario.getDataAdmissao(),
-                funcionario.getAtivo()
+            funcionario.getId(),
+            funcionario.getNome(),
+            funcionario.getEmail(),
+            funcionario.getCargo(),
+            funcionario.getSalario(),
+            funcionario.getDataAdmissao(),
+            funcionario.getAtivo(),
+            departamentoMapper.toResponseDTO(funcionario.getDepartamento())
         );
     }
 }
