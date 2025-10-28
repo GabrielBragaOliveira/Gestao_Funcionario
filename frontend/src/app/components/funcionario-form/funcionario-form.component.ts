@@ -4,10 +4,13 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractContro
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuncionarioRequest } from "../../models/models.component";
 import { FuncionarioService } from '../../services/services.funcionario';
+import { DepartamentoResponse } from '../../models/models.component';
+import { DepartamentoService } from '../../services/services.departamento';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { CalendarModule } from 'primeng/calendar';
 import { ButtonModule } from 'primeng/button';
+import { DropdownModule } from 'primeng/dropdown';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
@@ -16,30 +19,35 @@ import { MessageService } from 'primeng/api';
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule, 
+    ReactiveFormsModule,
     InputTextModule,
     InputNumberModule,
     CalendarModule,
     ButtonModule,
+    DropdownModule,
     ToastModule
   ],
   templateUrl: 'funcionario-form.component.html',
   providers: [MessageService]
 })
 export class FuncionarioFormComponent implements OnInit {
-  constructor(private router: Router) {}
+
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private service = inject(FuncionarioService);
+  private departamentoService = inject(DepartamentoService);
   private messageService = inject(MessageService);
 
   funcionarioForm!: FormGroup;
   isEditMode: boolean = false; 
   funcionarioId: number | null = null;
   pageTitle: string = 'Cadastrar Novo Funcionário';
+  departamentos: DepartamentoResponse[] = []; // lista de departamentos para o dropdown
 
   ngOnInit(): void {
     this.initializeForm();
+    this.carregarDepartamentos();
 
     this.route.paramMap.subscribe(params => {
       const idParam = params.get('id');
@@ -52,12 +60,14 @@ export class FuncionarioFormComponent implements OnInit {
     });
   }
 
+  // Validador para não aceitar apenas espaços
   noWhitespaceValidator(control: AbstractControl): { [key: string]: any } | null {
     const isWhitespace = (control.value || '').trim().length === 0;
     const isValid = !isWhitespace || control.value.length === 0; 
     return isValid ? null : { 'whitespace': true };
   }
 
+  // Validador para datas futuras
   dateNotFutureValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const date = control.value;
@@ -68,33 +78,27 @@ export class FuncionarioFormComponent implements OnInit {
     };
   }
 
+  // Inicializa o form
   initializeForm(): void {
     this.funcionarioForm = this.fb.group({
-      nome: ['', [
-        Validators.required,
-        Validators.minLength(3), 
-        this.noWhitespaceValidator 
-      ]],
-      email: ['', [
-        Validators.required,
-        Validators.email, 
-        this.noWhitespaceValidator
-      ]],
-      cargo: ['', [
-        Validators.required,
-        this.noWhitespaceValidator
-      ]],
-      salario: [null, [
-        Validators.required,
-        Validators.min(0.01) 
-      ]],
-      dataAdmissao: [null, [
-        Validators.required,
-        this.dateNotFutureValidator() 
-      ]]
+      nome: ['', [Validators.required, Validators.minLength(3), this.noWhitespaceValidator]],
+      email: ['', [Validators.required, Validators.email, this.noWhitespaceValidator]],
+      cargo: ['', [Validators.required, this.noWhitespaceValidator]],
+      salario: [null, [Validators.required, Validators.min(0.01)]],
+      dataAdmissao: [null, [Validators.required, this.dateNotFutureValidator()]],
+      departamento: [null, Validators.required]
     });
   }
 
+  // Carrega departamentos ativos para dropdown
+  carregarDepartamentos(): void {
+    this.departamentoService.listarAtivos().subscribe({
+      next: (data) => this.departamentos = data,
+      error: () => this.messageService.add({severity:'error', summary:'Erro', detail:'Não foi possível carregar departamentos'})
+    });
+  }
+
+  // Carrega funcionário para edição
   carregarFuncionarioParaEdicao(id: number): void {
     this.service.buscarPorId(id).subscribe({
       next: (data) => {
@@ -105,7 +109,8 @@ export class FuncionarioFormComponent implements OnInit {
           email: data.email,
           cargo: data.cargo,
           salario: data.salario,
-          dataAdmissao: dataAdmissaoDate
+          dataAdmissao: dataAdmissaoDate,
+          departamento: this.departamentos.find(d => d.id === data.departamento?.id) || null
         });
 
         if (!data.ativo) {
@@ -132,7 +137,8 @@ export class FuncionarioFormComponent implements OnInit {
 
     const request: FuncionarioRequest = {
       ...formValue,
-      dataAdmissao: dataAdmissaoFormatada
+      dataAdmissao: dataAdmissaoFormatada,
+      departamentoId: formValue.departamento?.id
     };
 
     if (this.isEditMode && this.funcionarioId) {
@@ -145,7 +151,7 @@ export class FuncionarioFormComponent implements OnInit {
           this.messageService.add({
             severity: 'error',
             summary: 'Erro na Edição',
-            detail: err.error?.message || 'Falha ao atualizar. Verifique as regras de negócio (Salário não reduzido, Email único).'
+            detail: err.error?.message || 'Falha ao atualizar. Verifique regras de negócio.'
           });
         }
       });
@@ -166,9 +172,7 @@ export class FuncionarioFormComponent implements OnInit {
     }
   }
 
-  get f() {
-    return this.funcionarioForm.controls;
-  }
+  get f() { return this.funcionarioForm.controls; }
 
   cancelar(): void {
     this.router.navigate(['/funcionarios']); 

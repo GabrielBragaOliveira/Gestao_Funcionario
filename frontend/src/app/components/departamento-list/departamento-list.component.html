@@ -1,0 +1,30 @@
+<p-table [value]="departamentos" [loading]="carregando">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Nome</th>
+      <th>Sigla</th>
+      <th>Status</th>
+      <th>Ações</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-dep>
+    <tr>
+      <td>{{ dep.nome }}</td>
+      <td>{{ dep.sigla }}</td>
+      <td>
+        <p-tag [value]="dep.ativo ? 'Ativo' : 'Inativo'" [severity]="dep.ativo ? 'success' : 'danger'"></p-tag>
+      </td>
+      <td>
+        <p-button icon="pi pi-pencil" class="p-button-rounded p-button-info p-mr-2" (click)="editar(dep)"></p-button>
+        <p-button icon="pi pi-ban" class="p-button-rounded p-button-warning" (click)="inativar(dep)" [disabled]="!dep.ativo"></p-button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+<p-dialog header="Departamento" [(visible)]="mostrarForm" [modal]="true" [closable]="false">
+  <app-departamento-form [departamentoParaEditar]="departamentoParaEditar"></app-departamento-form>
+  <p-footer>
+    <p-button label="Fechar" (click)="fecharForm()"></p-button>
+  </p-footer>
+</p-dialog>

@@ -6,30 +6,32 @@ package com.senai.gestaofuncionarios.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
 
 /**
  *
  * @author Aluno
  */
 @Entity
-@Table(name = "TB_FUNCIONARIO") 
+@Table(name = "TB_FUNCIONARIO")
 public class Funcionario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "nome", nullable = false)
     private String nome;
 
-    @Column(name = "email", nullable = false)  
+    @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "cargo", nullable = false)
@@ -43,6 +45,10 @@ public class Funcionario {
 
     @Column(name = "ativo", nullable = false)
     private Boolean ativo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "departamento_id", nullable = false)
+    private Departamento departamento;
 
     public Long getId() {
         return id;
@@ -99,9 +105,19 @@ public class Funcionario {
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
     }
-    
+
     public boolean isAtivo() {
         return ativo != null && ativo;
     }
+
+    public Departamento getDepartamento() {
+        return departamento;
+    }
+
+    public void setDepartamento(Departamento departamento) {
+        this.departamento = departamento;
+    }
     
+    
+
 }

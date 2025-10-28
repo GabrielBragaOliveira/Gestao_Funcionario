@@ -32,5 +32,9 @@ public record FuncionarioRequestDTO(
     BigDecimal salario, 
     
     @NotNull(message = "A data de admissão é obrigatória.") 
-    LocalDate dataAdmissao 
+    LocalDate dataAdmissao,
+    
+    @NotNull(message = "O ID do departamento é obrigatório.")
+    Long departamentoId 
+        
 ) {}

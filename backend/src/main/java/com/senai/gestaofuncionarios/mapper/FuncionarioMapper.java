@@ -6,6 +6,7 @@ package com.senai.gestaofuncionarios.mapper;
 
 import com.senai.gestaofuncionarios.dto.FuncionarioRequestDTO;
 import com.senai.gestaofuncionarios.dto.FuncionarioResponseDTO;
+import com.senai.gestaofuncionarios.model.Departamento;
 import com.senai.gestaofuncionarios.model.Funcionario;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class FuncionarioMapper {
 
-
     public Funcionario toEntity(FuncionarioRequestDTO dto) {
         if (dto == null) return null;
 
@@ -26,8 +26,6 @@ public class FuncionarioMapper {
         funcionario.setCargo(dto.cargo());
         funcionario.setSalario(dto.salario());
         funcionario.setDataAdmissao(dto.dataAdmissao());
-
-
         return funcionario;
     }
 
