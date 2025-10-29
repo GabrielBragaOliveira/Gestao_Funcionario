@@ -10,13 +10,18 @@ import { DepartamentoResponse } from '../../models/models.component';
 import { DepartamentoFormComponent } from '../departamento-form/departamento-form.component';
 import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-departamento-list',
   standalone: true,
-  imports: [CommonModule, TableModule, ButtonModule, TagModule, MessagesModule, DialogModule, FormsModule, DepartamentoFormComponent],
+  imports: [CommonModule, TableModule, ButtonModule, TagModule, 
+    MessagesModule, DialogModule, FormsModule, DepartamentoFormComponent,
+  ToastModule, ConfirmDialogModule],
   templateUrl: './departamento-list.component.html',
-  providers: [MessageService]
+  providers: [MessageService, ConfirmationService]
 })
 export class DepartamentoListComponent implements OnInit {
 
@@ -56,6 +61,11 @@ export class DepartamentoListComponent implements OnInit {
     this.mostrarForm = false;
     this.departamentoParaEditar = undefined;
     this.listarTodos();
+  }
+
+  novoDepartamento(): void {
+    this.departamentoParaEditar = undefined;
+    this.mostrarForm = true;                
   }
 
 }

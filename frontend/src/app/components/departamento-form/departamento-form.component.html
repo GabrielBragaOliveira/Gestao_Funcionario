@@ -9,10 +9,6 @@
     <input id="sigla" type="text" pInputText [(ngModel)]="departamento.sigla" [disabled]="carregando">
   </div>
 
-  <div class="p-field-checkbox">
-    <p-checkbox [(ngModel)]="departamento.ativo" binary="true" label="Ativo" [disabled]="carregando"></p-checkbox>
-  </div>
-
   <p-button label="Salvar" icon="pi pi-check" (click)="salvar()" [disabled]="carregando"></p-button>
 </div>
 

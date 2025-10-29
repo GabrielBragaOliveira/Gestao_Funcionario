@@ -68,4 +68,7 @@ public class Departamento {
         this.ativo = ativo;
     }
    
+    public boolean isAtivo() {
+        return ativo != null && ativo;
+    }
 }

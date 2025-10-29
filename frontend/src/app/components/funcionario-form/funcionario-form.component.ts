@@ -43,7 +43,7 @@ export class FuncionarioFormComponent implements OnInit {
   isEditMode: boolean = false; 
   funcionarioId: number | null = null;
   pageTitle: string = 'Cadastrar Novo Funcionário';
-  departamentos: DepartamentoResponse[] = []; // lista de departamentos para o dropdown
+  departamentos: DepartamentoResponse[] = []; 
 
   ngOnInit(): void {
     this.initializeForm();
@@ -60,14 +60,12 @@ export class FuncionarioFormComponent implements OnInit {
     });
   }
 
-  // Validador para não aceitar apenas espaços
   noWhitespaceValidator(control: AbstractControl): { [key: string]: any } | null {
     const isWhitespace = (control.value || '').trim().length === 0;
     const isValid = !isWhitespace || control.value.length === 0; 
     return isValid ? null : { 'whitespace': true };
   }
 
-  // Validador para datas futuras
   dateNotFutureValidator(): ValidatorFn {
     return (control: AbstractControl): { [key: string]: any } | null => {
       const date = control.value;
@@ -78,7 +76,6 @@ export class FuncionarioFormComponent implements OnInit {
     };
   }
 
-  // Inicializa o form
   initializeForm(): void {
     this.funcionarioForm = this.fb.group({
       nome: ['', [Validators.required, Validators.minLength(3), this.noWhitespaceValidator]],
@@ -90,15 +87,16 @@ export class FuncionarioFormComponent implements OnInit {
     });
   }
 
-  // Carrega departamentos ativos para dropdown
   carregarDepartamentos(): void {
-    this.departamentoService.listarAtivos().subscribe({
-      next: (data) => this.departamentos = data,
-      error: () => this.messageService.add({severity:'error', summary:'Erro', detail:'Não foi possível carregar departamentos'})
-    });
-  }
+  this.departamentoService.listarAtivos().subscribe({
+    next: (data) => {
+      console.log('Departamentos ativos:', data); 
+      this.departamentos = data;
+    },
+    error: () => this.messageService.add({severity:'error', summary:'Erro', detail:'Não foi possível carregar departamentos'})
+  });
+}
 
-  // Carrega funcionário para edição
   carregarFuncionarioParaEdicao(id: number): void {
     this.service.buscarPorId(id).subscribe({
       next: (data) => {
@@ -138,7 +136,8 @@ export class FuncionarioFormComponent implements OnInit {
     const request: FuncionarioRequest = {
       ...formValue,
       dataAdmissao: dataAdmissaoFormatada,
-      departamentoId: formValue.departamento?.id
+      departamentoId: formValue.departamento?.id,
+      ativo: true 
     };
 
     if (this.isEditMode && this.funcionarioId) {

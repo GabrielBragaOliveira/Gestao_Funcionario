@@ -5,27 +5,27 @@ import { DepartamentoResponse, DepartamentoRequest } from '../models/models.comp
 
 @Injectable({ providedIn: 'root' })
 export class DepartamentoService {
-  private baseUrl = '/api/departamentos';
+  private apiUrl = 'http://localhost:8084/api/v1/departamentos';
 
   constructor(private http: HttpClient) {}
 
   listarTodos(): Observable<DepartamentoResponse[]> {
-    return this.http.get<DepartamentoResponse[]>(`${this.baseUrl}`);
+    return this.http.get<DepartamentoResponse[]>(`${this.apiUrl}`);
   }
 
   listarAtivos(): Observable<DepartamentoResponse[]> {
-    return this.http.get<DepartamentoResponse[]>(`${this.baseUrl}/ativos`);
+    return this.http.get<DepartamentoResponse[]>(`${this.apiUrl}/ativos`);
   }
 
   criar(departamento: DepartamentoRequest): Observable<DepartamentoResponse> {
-    return this.http.post<DepartamentoResponse>(this.baseUrl, departamento);
+    return this.http.post<DepartamentoResponse>(this.apiUrl, departamento);
   }
 
   atualizar(id: number, departamento: DepartamentoRequest): Observable<DepartamentoResponse> {
-    return this.http.put<DepartamentoResponse>(`${this.baseUrl}/${id}`, departamento);
+    return this.http.put<DepartamentoResponse>(`${this.apiUrl}/${id}`, departamento);
   }
 
   inativar(id: number): Observable<void> {
-    return this.http.patch<void>(`${this.baseUrl}/${id}/inativar`, {});
+    return this.http.patch<void>(`${this.apiUrl}/${id}/inativar`, {});
   }
 }

@@ -7,7 +7,9 @@ package com.senai.gestaofuncionarios.service;
 import com.senai.gestaofuncionarios.dto.FuncionarioRequestDTO;
 import com.senai.gestaofuncionarios.dto.FuncionarioResponseDTO;
 import com.senai.gestaofuncionarios.mapper.FuncionarioMapper;
+import com.senai.gestaofuncionarios.model.Departamento;
 import com.senai.gestaofuncionarios.model.Funcionario;
+import com.senai.gestaofuncionarios.repository.DepartamentoRepository;
 import com.senai.gestaofuncionarios.repository.FuncionarioRepository;
 import java.time.LocalDate;
 import java.util.List;
@@ -30,6 +32,9 @@ public class FuncionarioService {
 
     @Autowired
     private FuncionarioMapper funcionarioMapper;
+    
+    @Autowired
+    private DepartamentoRepository departamentoRepository;
 
     public List<FuncionarioResponseDTO> listarTodos(String cargo, Boolean ativo) {
         List<Funcionario> funcionarios;
@@ -109,6 +114,12 @@ public class FuncionarioService {
         funcionarioExistente.setCargo(dto.cargo());
         funcionarioExistente.setSalario(dto.salario());
         funcionarioExistente.setDataAdmissao(dto.dataAdmissao());
+        
+        if (dto.departamentoId() != null) {
+        Departamento departamento = departamentoRepository.findById(dto.departamentoId())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Departamento não encontrado"));
+        funcionarioExistente.setDepartamento(departamento);
+    }
 
         Funcionario funcionarioAtualizado = funcionarioRepository.save(funcionarioExistente);
         return funcionarioMapper.toResponseDTO(funcionarioAtualizado);

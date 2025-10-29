@@ -46,27 +46,28 @@ public class DepartamentoService {
     }
 
     public DepartamentoResponseDTO criar(DepartamentoRequestDTO dto) {
-        Optional<Departamento> existente = departamentoRepository.findByNome(dto.nome());
+    Optional<Departamento> existente = departamentoRepository.findByNome(dto.nome());
 
-        if (existente.isPresent()) {
-            Departamento dep = existente.get();
-            if (!dep.getAtivo()) {
-                dep.setSigla(dto.sigla());
-                dep.setAtivo(true);
-                departamentoRepository.save(dep);
-                return departamentoMapper.toResponseDTO(dep);
-            } else {
-                throw new ResponseStatusException(HttpStatus.CONFLICT,
-                        "Já existe um departamento ativo com esse nome.");
-            }
+    if (existente.isPresent()) {
+        Departamento dep = existente.get();
+        if (!dep.getAtivo()) {
+            dep.setSigla(dto.sigla());
+            dep.setAtivo(true);
+            Departamento reativado = departamentoRepository.save(dep);
+            return departamentoMapper.toResponseDTO(reativado);
+        } else {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Já existe um departamento ativo com esse nome.");
         }
-
-        Departamento departamento = departamentoMapper.toEntity(dto);
-        departamento.setAtivo(true);
-        Departamento salvo = departamentoRepository.save(departamento);
-
-        return departamentoMapper.toResponseDTO(salvo);
     }
+
+    Departamento departamento = departamentoMapper.toEntity(dto);
+    departamento.setAtivo(true);
+    Departamento salvo = departamentoRepository.save(departamento);
+
+    return departamentoMapper.toResponseDTO(salvo);
+}
+
 
     public DepartamentoResponseDTO buscarPorId(Long id) {
         Departamento departamento = departamentoRepository.findById(id)
