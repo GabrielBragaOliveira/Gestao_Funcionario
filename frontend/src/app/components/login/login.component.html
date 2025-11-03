@@ -1,0 +1,54 @@
+<p-toast></p-toast>
+
+<div class="p-d-flex p-jc-center p-ai-center" style="height: 100vh;">
+  <div class="p-card p-shadow-4" style="width: 400px; padding: 20px;">
+    <h2 class="p-text-center">Login</h2>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+      <!-- Campo de E-mail -->
+      <div class="p-field">
+        <label for="email">Email</label>
+        <input
+          pInputText
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Digite seu e-mail"
+          [class.p-invalid]="f['email'].invalid && f['email'].touched"
+        />
+        <small *ngIf="f['email'].invalid && f['email'].touched" class="p-error">
+          <ng-container *ngIf="f['email'].errors?.['required']">E-mail é obrigatório</ng-container>
+          <ng-container *ngIf="f['email'].errors?.['email']">E-mail inválido</ng-container>
+        </small>
+      </div>
+
+      <!-- Campo de Senha -->
+      <div class="p-field">
+        <label for="password">Senha</label>
+        <p-password
+          id="password"
+          formControlName="password"
+          placeholder="Digite sua senha"
+          [feedback]="false"
+          [toggleMask]="true"
+          [inputStyle]="{ width: '100%' }"
+          [class.p-invalid]="f['password'].invalid && f['password'].touched"
+        ></p-password>
+        <small *ngIf="f['password'].invalid && f['password'].touched" class="p-error">
+          <ng-container *ngIf="f['password'].errors?.['required']">Senha é obrigatória</ng-container>
+          <ng-container *ngIf="f['password'].errors?.['minlength']">A senha deve ter pelo menos 6 caracteres</ng-container>
+        </small>
+      </div>
+
+      <!-- Botão de Login -->
+      <div class="p-d-flex p-jc-center">
+        <p-button
+          type="submit"
+          label="Entrar"
+          [disabled]="loginForm.invalid"
+          icon="pi pi-sign-in"
+        ></p-button>
+      </div>
+    </form>
+  </div>
+</div>

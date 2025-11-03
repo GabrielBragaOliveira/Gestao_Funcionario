@@ -1,0 +1,15 @@
+<header class="header">
+  <div class="logo">
+    <h3>Login</h3>
+  </div>
+
+  <nav class="menu">
+    <ul *ngIf="isAuthenticated; else loginLink">
+      <li><button (click)="onLogout()">Sair</button></li>
+    </ul>
+
+    <ng-template #loginLink>
+      <button (click)="onLogin()">Login</button>
+    </ng-template>
+  </nav>
+</header>

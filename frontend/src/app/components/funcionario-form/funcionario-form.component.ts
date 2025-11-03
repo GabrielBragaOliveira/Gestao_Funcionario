@@ -40,10 +40,11 @@ export class FuncionarioFormComponent implements OnInit {
   private messageService = inject(MessageService);
 
   funcionarioForm!: FormGroup;
-  isEditMode: boolean = false; 
+  isEditMode: boolean = false;
   funcionarioId: number | null = null;
   pageTitle: string = 'Cadastrar Novo Funcionário';
-  departamentos: DepartamentoResponse[] = []; 
+  departamentos: DepartamentoResponse[] = [];
+  isSalvo: boolean = false;  
 
   ngOnInit(): void {
     this.initializeForm();
@@ -58,11 +59,15 @@ export class FuncionarioFormComponent implements OnInit {
         this.carregarFuncionarioParaEdicao(this.funcionarioId);
       }
     });
+
+    this.funcionarioForm.valueChanges.subscribe(() => {
+      this.isSalvo = false;  
+    });
   }
 
   noWhitespaceValidator(control: AbstractControl): { [key: string]: any } | null {
     const isWhitespace = (control.value || '').trim().length === 0;
-    const isValid = !isWhitespace || control.value.length === 0; 
+    const isValid = !isWhitespace || control.value.length === 0;
     return isValid ? null : { 'whitespace': true };
   }
 
@@ -88,14 +93,15 @@ export class FuncionarioFormComponent implements OnInit {
   }
 
   carregarDepartamentos(): void {
-  this.departamentoService.listarAtivos().subscribe({
-    next: (data) => {
-      console.log('Departamentos ativos:', data); 
-      this.departamentos = data;
-    },
-    error: () => this.messageService.add({severity:'error', summary:'Erro', detail:'Não foi possível carregar departamentos'})
-  });
-}
+    this.departamentoService.listarAtivos().subscribe({
+      next: (data) => {
+        this.departamentos = data;
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Erro', detail: 'Não foi possível carregar departamentos' });
+      }
+    });
+  }
 
   carregarFuncionarioParaEdicao(id: number): void {
     this.service.buscarPorId(id).subscribe({
@@ -112,7 +118,7 @@ export class FuncionarioFormComponent implements OnInit {
         });
 
         if (!data.ativo) {
-          this.funcionarioForm.disable();
+          this.funcionarioForm.disable(); 
           this.messageService.add({ severity: 'info', summary: 'Aviso', detail: 'Este funcionário está inativo e não pode ser editado.' });
         }
       },
@@ -131,13 +137,13 @@ export class FuncionarioFormComponent implements OnInit {
     }
 
     const formValue = this.funcionarioForm.getRawValue();
-    const dataAdmissaoFormatada = (formValue.dataAdmissao as Date).toISOString().split('T')[0];
+    const dataAdmissaoFormatada = (formValue.dataAdmissao as Date).toISOString().split('T')[0];  // Formata a data para o formato ISO
 
     const request: FuncionarioRequest = {
       ...formValue,
       dataAdmissao: dataAdmissaoFormatada,
       departamentoId: formValue.departamento?.id,
-      ativo: true 
+      ativo: true
     };
 
     if (this.isEditMode && this.funcionarioId) {
@@ -145,6 +151,7 @@ export class FuncionarioFormComponent implements OnInit {
         next: () => {
           this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Funcionário atualizado.' });
           this.router.navigate(['/funcionarios']);
+          this.isSalvo = true; 
         },
         error: (err) => {
           this.messageService.add({
@@ -159,6 +166,7 @@ export class FuncionarioFormComponent implements OnInit {
         next: () => {
           this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Funcionário cadastrado.' });
           this.router.navigate(['/funcionarios']);
+          this.isSalvo = true;
         },
         error: (err) => {
           this.messageService.add({
@@ -174,6 +182,13 @@ export class FuncionarioFormComponent implements OnInit {
   get f() { return this.funcionarioForm.controls; }
 
   cancelar(): void {
-    this.router.navigate(['/funcionarios']); 
+    this.router.navigate(['/funcionarios']);
+  }
+
+  canDeactivate(): boolean {
+    if (!this.isSalvo && this.funcionarioForm.dirty) {
+      return confirm("Seus dados não foram salvos. Deseja sair assim mesmo?");
+    }
+    return true; 
   }
 }
